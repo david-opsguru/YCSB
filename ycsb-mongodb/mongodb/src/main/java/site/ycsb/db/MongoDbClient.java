@@ -414,7 +414,7 @@ public class MongoDbClient extends DB {
 
             // AWS credentials setup from Service Account
             StsClient stsClient = StsClient.builder()
-                .credentialsProvider(ContainerCredentialsProvider.create())
+                .credentialsProvider(DefaultCredentialsProvider.create())
                 .region(Region.EU_WEST_1)
                 .build();
 
