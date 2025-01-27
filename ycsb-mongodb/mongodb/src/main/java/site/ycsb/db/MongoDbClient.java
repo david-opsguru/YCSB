@@ -42,6 +42,11 @@ import org.bson.BsonInt64;
 import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sts.StsClient;
+import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
+import software.amazon.awssdk.services.sts.model.GetCallerIdentityResponse;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -67,7 +72,7 @@ class UuidUtils {
       bb.putLong(uuid.getLeastSignificantBits());
       return bb.array();
     }
-  }
+}
 
 /**
  * MongoDB client for YCSB framework.
@@ -406,8 +411,14 @@ public class MongoDbClient extends DB {
             Properties props = getProperties();
             String urls = props.getProperty("mongodb.url", "mongodb://localhost:27017");
 
-            /* Credentials */
-            database = props.getProperty("mongodb.database", "ycsb");
+          // AWS credentials setup from Service Account
+          StsClient stsClient = StsClient.builder()
+              .credentialsProvider(DefaultCredentialsProvider.create())  // Using the EKS pod's IAM Role
+              .region(Region.of("us-west-2"))  // Replace with your region
+              .build();
+
+          GetCallerIdentityRequest request = GetCallerIdentityRequest.builder().build();
+          GetCallerIdentityResponse response = stsClient.getCallerIdentity(request);
 
             // Retrieve username and password from properties, set to empty string if they are undefined
             String username = props.getProperty("mongodb.username", "");
