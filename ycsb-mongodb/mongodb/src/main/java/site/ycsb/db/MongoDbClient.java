@@ -42,6 +42,7 @@ import org.bson.BsonInt64;
 import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
+import software.amazon.awssdk.auth.credentials.ContainerCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.StsClient;
@@ -413,8 +414,8 @@ public class MongoDbClient extends DB {
 
             // AWS credentials setup from Service Account
             StsClient stsClient = StsClient.builder()
-                .credentialsProvider(DefaultCredentialsProvider.create())  // Using the EKS pod's IAM Role
-                .region(Region.of("us-west-2"))  // Replace with your region
+                .credentialsProvider(ContainerCredentialsProvider.create())
+                .region(Region.EU_WEST_1)
                 .build();
 
             GetCallerIdentityRequest request = GetCallerIdentityRequest.builder().build();
