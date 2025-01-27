@@ -112,7 +112,7 @@ public class MongoDbClient extends DB {
     private Integer insertCount = 0;
 
     /** The database to access. */
-    private static String database;
+    private static String database = "test";
 
     /** Count the number of times initialized to teardown on the last {@link #cleanup()}. */
     private static final AtomicInteger initCount = new AtomicInteger(0);
@@ -411,14 +411,14 @@ public class MongoDbClient extends DB {
             Properties props = getProperties();
             String urls = props.getProperty("mongodb.url", "mongodb://localhost:27017");
 
-          // AWS credentials setup from Service Account
-          StsClient stsClient = StsClient.builder()
-              .credentialsProvider(DefaultCredentialsProvider.create())  // Using the EKS pod's IAM Role
-              .region(Region.of("us-west-2"))  // Replace with your region
-              .build();
+            // AWS credentials setup from Service Account
+            StsClient stsClient = StsClient.builder()
+                .credentialsProvider(DefaultCredentialsProvider.create())  // Using the EKS pod's IAM Role
+                .region(Region.of("us-west-2"))  // Replace with your region
+                .build();
 
-          GetCallerIdentityRequest request = GetCallerIdentityRequest.builder().build();
-          GetCallerIdentityResponse response = stsClient.getCallerIdentity(request);
+            GetCallerIdentityRequest request = GetCallerIdentityRequest.builder().build();
+            GetCallerIdentityResponse response = stsClient.getCallerIdentity(request);
 
             // Retrieve username and password from properties, set to empty string if they are undefined
             String username = props.getProperty("mongodb.username", "");
