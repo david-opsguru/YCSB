@@ -343,15 +343,6 @@ public class MongoDbClient extends DB {
                 // This creates the encrypted data collection (EDC) and the auxilliary
                 // collections, as well as the index on the __safeContent__ field.
                 client.getDatabase(database).createCollection(collName, options);
-
-                if (isSharded) {
-                    BsonDocument enableShardingCmd = new BsonDocument("enableSharding", new BsonString(database));
-                    client.getDatabase("admin").runCommand(enableShardingCmd);
-
-                    BsonDocument shardCollCmd = new BsonDocument("shardCollection", new BsonString(collNamespace))
-                        .append("key", new BsonDocument("_id", new BsonString("hashed")));
-                    client.getDatabase("admin").runCommand(shardCollCmd);
-                }
             }
             return autoEncryptionSettingsBuilder.build();
         }
@@ -554,7 +545,7 @@ public class MongoDbClient extends DB {
                     .serverApi(serverApi)
                     .build();
                 mongoClient = MongoClients.create(settings);
-                mongoDatabase = mongoClient.getDatabase("admin");
+                mongoDatabase = mongoClient.getDatabase(database);
             } catch (Exception e1) {
                 log.error("Could not initialize MongoDB connection pool for Loader: {}", String.valueOf(e1));
                 System.exit(1);
