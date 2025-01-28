@@ -720,7 +720,6 @@ public class MongoDbClient extends DB {
     public Status read(String table, String key, Set<String> fields,
                        Map<String, ByteIterator> result) {
         try {
-            log.info("Querying table: {} with key: {}", table, key);
             MongoCollection<Document> collection = db[serverCounter++ % db.length].getCollection(table);
             Document q = new Document("_id", key);
             Document fieldsToReturn;
@@ -742,7 +741,6 @@ public class MongoDbClient extends DB {
                 result.putAll(new LinkedHashMap(queryResult));
                 return Status.OK;
             }
-            log.error("No results returned for key {}", key);
             return Status.ERROR;
         } catch (Exception e) {
             log.error(e.toString());
@@ -771,12 +769,10 @@ public class MongoDbClient extends DB {
             u.put("$set", fieldsToSet);
             UpdateResult res = collection.updateOne(q, u);
             if (res.getMatchedCount() == 0) {
-                log.error("Nothing updated for key {}", key);
                 return Status.ERROR;
             }
             return Status.OK;
         } catch (Exception e) {
-            log.error(e.getMessage());
             return Status.ERROR;
         }
     }
@@ -810,7 +806,6 @@ public class MongoDbClient extends DB {
             }
             cursor = collection.find(q).projection(fieldsToReturn).sort(s).limit(recordcount).cursor();
             if (!cursor.hasNext()) {
-                log.error("Nothing found in scan for key {}", startkey);
                 return Status.ERROR;
             }
             while (cursor.hasNext()) {
@@ -826,7 +821,6 @@ public class MongoDbClient extends DB {
 
             return Status.OK;
         } catch (Exception e) {
-            log.error(e.getMessage());
             return Status.ERROR;
         } finally {
             if (cursor != null) {
