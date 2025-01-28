@@ -538,6 +538,7 @@ public class MongoDbClient extends DB {
                     .applyToClusterSettings(builder -> builder.requiredClusterType(ClusterType.REPLICA_SET))
                     .build();
                 mongoClient = MongoClients.create(settings);
+                mongoClient.startSession();
                 mongoDatabase = mongoClient.getDatabase(database);
             } catch (Exception e1) {
                 log.error("Could not initialize MongoDB connection pool for Loader: {}", String.valueOf(e1));
