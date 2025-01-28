@@ -47,6 +47,8 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.StsClient;
+import software.amazon.awssdk.services.sts.model.AssumeRoleRequest;
+import software.amazon.awssdk.services.sts.model.AssumeRoleResponse;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityRequest;
 import software.amazon.awssdk.services.sts.model.GetCallerIdentityResponse;
 
@@ -431,9 +433,6 @@ public class MongoDbClient extends DB {
                   .credentialsProvider(credentialsProvider)
                   .region(Region.EU_WEST_1)
                   .build();
-
-            GetCallerIdentityRequest request = GetCallerIdentityRequest.builder().build();
-            GetCallerIdentityResponse response = stsClient.getCallerIdentity(request);
 
             // Retrieve username and password from properties, set to empty string if they are undefined
             String username = props.getProperty("mongodb.username", "");
