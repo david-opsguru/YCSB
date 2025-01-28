@@ -107,9 +107,7 @@ public class DBWrapper extends DB {
       }
 
       if (LOG_REPORT_CONFIG.compareAndSet(false, true)) {
-        log.error("DBWrapper: report latency for each error is " +
-            this.reportLatencyForEachError + " and specific error codes to track" +
-            " for latency are: " + this.latencyTrackedErrors.toString());
+          log.info("DBWrapper: report latency for each error is {} and specific error codes to track for latency are: {}", this.reportLatencyForEachError, this.latencyTrackedErrors.toString());
       }
     }
   }
