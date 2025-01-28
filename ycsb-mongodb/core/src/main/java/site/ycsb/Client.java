@@ -17,10 +17,8 @@
 
 package site.ycsb;
 
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 import site.ycsb.measurements.Measurements;
 import site.ycsb.measurements.exporter.MeasurementsExporter;
 import site.ycsb.measurements.exporter.TextMeasurementsExporter;
@@ -36,7 +34,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Turn seconds remaining into more useful units.
@@ -82,11 +79,7 @@ public final class Client {
 
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
-    private Client() {
-        ILoggerFactory loggerContext = LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
-        rootLogger.makeLoggingEventBuilder(Level.ERROR);
-    }
+    private Client() { }
 
     public static final String DEFAULT_RECORD_COUNT = "0";
 
@@ -526,7 +519,6 @@ public final class Client {
 
     private static Properties parseArguments(String[] args) {
         Properties props = new Properties();
-        log.info("Command line: {}", String.join(" ", args));
 
         Properties fileprops = new Properties();
         int argindex = 0;
