@@ -249,7 +249,7 @@ public final class CommandLine {
       log.info("Error: syntax is \"delete keyname\"");
     } else {
       Status ret = db.delete(table, tokens[1]);
-      log.info("Return result: " + ret.getName());
+        log.info("Return result: {}", ret.getName());
     }
   }
 
@@ -265,7 +265,7 @@ public final class CommandLine {
       }
 
       Status ret = db.insert(table, tokens[1], values);
-      log.info("Result: " + ret.getName());
+      log.info("Result: {}", ret.getName());
     }
   }
 

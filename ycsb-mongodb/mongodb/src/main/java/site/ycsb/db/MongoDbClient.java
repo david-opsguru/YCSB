@@ -23,7 +23,6 @@ import com.mongodb.client.result.UpdateResult;
 import com.mongodb.client.vault.ClientEncryption;
 import com.mongodb.client.vault.ClientEncryptions;
 
-import com.mongodb.connection.ClusterSettings;
 import com.mongodb.connection.ClusterType;
 import site.ycsb.ByteArrayByteIterator;
 import site.ycsb.ByteIterator;
@@ -102,8 +101,6 @@ public class MongoDbClient extends DB {
 
     private static MongoDatabase mongoDatabase;
 
-    private static int serverCounter = 0;
-
     /**
      * The default write concern for the test.
      */
@@ -140,8 +137,6 @@ public class MongoDbClient extends DB {
     private static String datatype = "binData";
 
     private static final String algorithm = "AEAD_AES_256_CBC_HMAC_SHA_512-Random";
-
-    private static boolean isSharded = false;
 
     enum Encryption {
         UNENCRYPTED,
@@ -505,13 +500,9 @@ public class MongoDbClient extends DB {
                     System.exit(1);
             }
 
-            // sharded
-            isSharded = Boolean.parseBoolean(props.getProperty("mongodb.sharded", "false"));
-
             // encryption - FLE or Queryable Encryption
             boolean use_fle = Boolean.parseBoolean(props.getProperty("mongodb.fle", "false"));
             boolean use_qe = Boolean.parseBoolean(props.getProperty("mongodb.qe", "false"));
-            boolean use_encryption = use_fle || use_qe;
 
             if (use_fle && use_qe) {
                 log.error("ERROR: mongodb.fle and mongodb.qe cannot both be true");
@@ -538,8 +529,8 @@ public class MongoDbClient extends DB {
                     .readPreference(readPreference)
                     .applyToClusterSettings(builder -> builder.requiredClusterType(ClusterType.REPLICA_SET))
                     .applyToConnectionPoolSettings(builder -> builder
-                    .maxSize(100)
-                    .minSize(10)
+                    .maxSize(10)
+                    .minSize(2)
                     .maxWaitTime(10, TimeUnit.SECONDS))
                     .build();
                 mongoClient = MongoClients.create(settings);
@@ -550,17 +541,6 @@ public class MongoDbClient extends DB {
                 System.exit(1);
             }
         }
-    }
-
-    private static MongoClientSettings.Builder getSettingsBuilder(boolean use_encryption, String maxConnections) {
-        MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder();
-        // Need to use a larger connection pool to talk to mongocryptd/keyvault
-        if (use_encryption) {
-            settingsBuilder.applyToConnectionPoolSettings(builder -> builder.maxSize(Integer.parseInt(maxConnections) * 3));
-        } else {
-            settingsBuilder.applyToConnectionPoolSettings(builder -> builder.maxSize(Integer.parseInt(maxConnections)));
-        }
-        return settingsBuilder;
     }
 
     /**
@@ -602,7 +582,6 @@ public class MongoDbClient extends DB {
             return Status.OK;
         } catch (Exception e) {
             log.error(e.getMessage());
-            e.printStackTrace();
             return Status.ERROR;
         }
     }
@@ -628,7 +607,6 @@ public class MongoDbClient extends DB {
                 return Status.OK;
             } catch (Exception e) {
                 log.error("Couldn't insert key {}", key);
-                e.printStackTrace();
                 return Status.ERROR;
             }
         }
@@ -699,7 +677,7 @@ public class MongoDbClient extends DB {
             }
             return Status.ERROR;
         } catch (Exception e) {
-            log.error(e.toString());
+            log.error(e.getMessage());
             return Status.ERROR;
         }
     }
