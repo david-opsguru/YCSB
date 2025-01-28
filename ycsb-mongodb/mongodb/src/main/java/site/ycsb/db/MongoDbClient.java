@@ -425,8 +425,10 @@ public class MongoDbClient extends DB {
             String urls = props.getProperty("mongodb.url", "mongodb://localhost:27017");
 
             // AWS credentials setup from Service Account
-            StsClient stsClient = StsClient.builder()
-                .credentialsProvider(DefaultCredentialsProvider.create())
+          DefaultCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
+          validateCredentials(credentialsProvider);
+          StsClient stsClient = StsClient.builder()
+                .credentialsProvider(credentialsProvider)
                 .region(Region.EU_WEST_1)
                 .build();
 
