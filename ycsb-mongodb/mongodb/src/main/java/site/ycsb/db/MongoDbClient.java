@@ -11,13 +11,7 @@
 
 package site.ycsb.db;
 
-import com.mongodb.AutoEncryptionSettings;
-import com.mongodb.ClientEncryptionSettings;
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.ReadPreference;
-import com.mongodb.ServerAddress;
-import com.mongodb.WriteConcern;
+import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -42,7 +36,6 @@ import org.bson.BsonInt64;
 import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.StsClient;
@@ -89,7 +82,7 @@ class UuidUtils {
  *
  * @author ypai
  */
-@SuppressWarnings({"UnnecessaryToStringCall", "StringConcatenationInsideStringBufferAppend"})
+@SuppressWarnings({"StringConcatenationInsideStringBufferAppend"})
 public class MongoDbClient extends DB {
 
     private static final Logger log = LoggerFactory.getLogger(MongoDbClient.class);
@@ -102,9 +95,9 @@ public class MongoDbClient extends DB {
     /**
      * A singleton MongoClient instance.
      */
-    private static MongoClient[] mongo;
+    private static MongoClient mongoClient;
 
-    private static MongoDatabase[] db;
+    private static MongoDatabase mongoDatabase;
 
     private static int serverCounter = 0;
 
@@ -421,7 +414,7 @@ public class MongoDbClient extends DB {
     public void init() {
         initCount.incrementAndGet();
         synchronized (INCLUDE) {
-            if (mongo != null) {
+            if (mongoClient != null) {
                 return;
             }
 
@@ -553,42 +546,17 @@ public class MongoDbClient extends DB {
 
                 String userPassword = username.equals("") ? "" : username + (password.equals("") ? "" : ":" + password) + "@";
 
-                String[] server = urls.split("\\|"); // split on the "|" character
-                mongo = new MongoClient[server.length];
-                db = new MongoDatabase[server.length];
-
-                for (int i = 0; i < server.length; i++) {
-                    // If the URI does not contain credentials, but they are provided in the properties, append them to the URI
-                    String url = server[i].contains("@")
-                        ? server[i]
-                        : userPassword.equals("") ? server[i] : server[i].replace("://", "://" + userPassword);
-                    if (i == 0 && use_encryption) {
-                        AutoEncryptionSettings autoEncryptionSettings = generateEncryptionSettings(url, props);
-                        settingsBuilder.autoEncryptionSettings(autoEncryptionSettings);
-                    }
-
-                    // if mongodb:// prefix is present then this is MongoClientURI format
-                    // combine with options to get MongoClient
-                    if (url.startsWith("mongodb://") || url.startsWith("mongodb+srv://")) {
-                        settingsBuilder.applyConnectionString(new ConnectionString(url));
-                        mongo[i] = MongoClients.create(settingsBuilder.build());
-
-                        String dispURI = userPassword.equals("")
-                            ? url
-                            : url.replace(userPassword, username + ":XXXXXX@");
-                        log.info("mongo connection created to {}", dispURI);
-                    } else {
-                        settingsBuilder.applyToClusterSettings(builder ->
-                            builder.hosts(Collections.singletonList(new ServerAddress(url))));
-                        mongo[i] = MongoClients.create(settingsBuilder.build());
-                        log.info("DEBUG mongo server connection to {}", mongo[i].toString());
-                    }
-                    db[i] = mongo[i].getDatabase(database);
-
-                }
+                ServerApi serverApi = ServerApi.builder()
+                    .version(ServerApiVersion.V1)
+                    .build();
+                MongoClientSettings settings = MongoClientSettings.builder()
+                    .applyConnectionString(new ConnectionString(urls))
+                    .serverApi(serverApi)
+                    .build();
+                mongoClient = MongoClients.create(settings);
+                mongoDatabase = mongoClient.getDatabase("admin");
             } catch (Exception e1) {
                 log.error("Could not initialize MongoDB connection pool for Loader: {}", String.valueOf(e1));
-                e1.printStackTrace();
                 System.exit(1);
             }
         }
@@ -601,11 +569,9 @@ public class MongoDbClient extends DB {
     @Override
     public void cleanup() {
         if (initCount.decrementAndGet() <= 0) {
-            for (MongoClient mongoClient : mongo) {
-                try {
-                    mongoClient.close();
-                } catch (Exception e1) { /* ignore */ }
-            }
+            try {
+                mongoClient.close();
+            } catch (Exception e1) { /* ignore */ }
         }
     }
 
@@ -629,7 +595,7 @@ public class MongoDbClient extends DB {
     @Override
     public Status delete(String table, String key) {
         try {
-            MongoCollection<Document> collection = db[serverCounter++ % db.length].getCollection(table);
+            MongoCollection<Document> collection = mongoDatabase.getCollection(table);
             Document q = new Document("_id", key);
             collection.deleteMany(q);
             return Status.OK;
@@ -652,7 +618,7 @@ public class MongoDbClient extends DB {
     @Override
     public Status insert(String table, String key,
                          Map<String, ByteIterator> values) {
-        MongoCollection<Document> collection = db[serverCounter++ % db.length].getCollection(table);
+        MongoCollection<Document> collection = mongoDatabase.getCollection(table);
         Document r = new Document("_id", key);
         processBatch(values, r);
         if (BATCHSIZE == 1) {
@@ -679,7 +645,6 @@ public class MongoDbClient extends DB {
                 return Status.OK;
             } catch (Exception e) {
                 log.error("Exception while trying bulk insert with {}", insertCount);
-                e.printStackTrace();
                 return Status.ERROR;
             }
         }
@@ -710,7 +675,7 @@ public class MongoDbClient extends DB {
     public Status read(String table, String key, Set<String> fields,
                        Map<String, ByteIterator> result) {
         try {
-            MongoCollection<Document> collection = db[serverCounter++ % db.length].getCollection(table);
+            MongoCollection<Document> collection = mongoDatabase.getCollection(table);
             Document q = new Document("_id", key);
             Document fieldsToReturn;
 
@@ -751,7 +716,7 @@ public class MongoDbClient extends DB {
     public Status update(String table, String key,
                          Map<String, ByteIterator> values) {
         try {
-            MongoCollection<Document> collection = db[serverCounter++ % db.length].getCollection(table);
+            MongoCollection<Document> collection = mongoDatabase.getCollection(table);
             Document q = new Document("_id", key);
             Document u = new Document();
             Document fieldsToSet = new Document();
@@ -782,7 +747,7 @@ public class MongoDbClient extends DB {
                        Set<String> fields, Vector<HashMap<String, ByteIterator>> result) {
         MongoCursor<Document> cursor = null;
         try {
-            MongoCollection<Document> collection = db[serverCounter++ % db.length].getCollection(table);
+            MongoCollection<Document> collection = mongoDatabase.getCollection(table);
             Document fieldsToReturn = null;
             // { "_id":{"$gte":startKey, "$lte":{"appId":key+"\uFFFF"}} }
             Document scanRange = new Document("$gte", startkey);
