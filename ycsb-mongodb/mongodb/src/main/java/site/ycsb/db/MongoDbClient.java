@@ -23,6 +23,8 @@ import com.mongodb.client.result.UpdateResult;
 import com.mongodb.client.vault.ClientEncryption;
 import com.mongodb.client.vault.ClientEncryptions;
 
+import com.mongodb.connection.ClusterSettings;
+import com.mongodb.connection.ClusterType;
 import site.ycsb.ByteArrayByteIterator;
 import site.ycsb.ByteIterator;
 import site.ycsb.DB;
@@ -525,16 +527,15 @@ public class MongoDbClient extends DB {
             discreteFields = createDiscreteFieldsMap(props.getProperty("mongodb.cardinalities", ""));
 
             try {
-                MongoClientSettings.Builder settingsBuilder = getSettingsBuilder(use_encryption, maxConnections);
-                settingsBuilder.writeConcern(writeConcern);
-                settingsBuilder.readPreference(readPreference);
-
                 ServerApi serverApi = ServerApi.builder()
                     .version(ServerApiVersion.V1)
                     .build();
-                MongoClientSettings settings = settingsBuilder
+                MongoClientSettings settings = MongoClientSettings.builder()
                     .applyConnectionString(new ConnectionString(urls))
                     .serverApi(serverApi)
+                    .writeConcern(writeConcern)
+                    .readPreference(readPreference)
+                    .applyToClusterSettings(builder -> builder.requiredClusterType(ClusterType.REPLICA_SET))
                     .build();
                 mongoClient = MongoClients.create(settings);
                 mongoDatabase = mongoClient.getDatabase(database);
