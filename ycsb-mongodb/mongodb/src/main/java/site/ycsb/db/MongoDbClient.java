@@ -29,6 +29,7 @@ import com.mongodb.client.result.UpdateResult;
 import com.mongodb.client.vault.ClientEncryption;
 import com.mongodb.client.vault.ClientEncryptions;
 
+import org.slf4j.LoggerFactory;
 import site.ycsb.ByteArrayByteIterator;
 import site.ycsb.ByteIterator;
 import site.ycsb.DB;
@@ -42,7 +43,7 @@ import org.bson.BsonInt64;
 import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
-import software.amazon.awssdk.auth.credentials.ContainerCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.StsClient;
@@ -64,6 +65,7 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 class UuidUtils {
 
@@ -395,6 +397,16 @@ public class MongoDbClient extends DB {
         }
         return outputMap;
     }
+
+  private void validateCredentials(AwsCredentialsProvider credentialsProvider) {
+    try {
+      credentialsProvider.resolveCredentials();
+      System.out.println("IAM Role credentials successfully resolved!");
+    } catch (Exception e) {
+      System.out.println("Failed to validate credentials: " + e.getMessage());
+      throw new RuntimeException("AWS credentials are invalid or unavailable.", e);
+    }
+  }
 
     /**
      * Initialize any state for this DB.
