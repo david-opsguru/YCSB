@@ -525,22 +525,14 @@ public class MongoDbClient extends DB {
             discreteFields = createDiscreteFieldsMap(props.getProperty("mongodb.cardinalities", ""));
 
             try {
-                MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder();
-                // Need to use a larger connection pool to talk to mongocryptd/keyvault
-                if (use_encryption) {
-                    settingsBuilder.applyToConnectionPoolSettings(builder -> builder.maxSize(Integer.parseInt(maxConnections) * 3));
-                } else {
-                    settingsBuilder.applyToConnectionPoolSettings(builder -> builder.maxSize(Integer.parseInt(maxConnections)));
-                }
+                MongoClientSettings.Builder settingsBuilder = getSettingsBuilder(use_encryption, maxConnections);
                 settingsBuilder.writeConcern(writeConcern);
                 settingsBuilder.readPreference(readPreference);
-
-                String userPassword = username.equals("") ? "" : username + (password.equals("") ? "" : ":" + password) + "@";
 
                 ServerApi serverApi = ServerApi.builder()
                     .version(ServerApiVersion.V1)
                     .build();
-                MongoClientSettings settings = MongoClientSettings.builder()
+                MongoClientSettings settings = settingsBuilder
                     .applyConnectionString(new ConnectionString(urls))
                     .serverApi(serverApi)
                     .build();
@@ -551,6 +543,17 @@ public class MongoDbClient extends DB {
                 System.exit(1);
             }
         }
+    }
+
+    private static MongoClientSettings.Builder getSettingsBuilder(boolean use_encryption, String maxConnections) {
+        MongoClientSettings.Builder settingsBuilder = MongoClientSettings.builder();
+        // Need to use a larger connection pool to talk to mongocryptd/keyvault
+        if (use_encryption) {
+            settingsBuilder.applyToConnectionPoolSettings(builder -> builder.maxSize(Integer.parseInt(maxConnections) * 3));
+        } else {
+            settingsBuilder.applyToConnectionPoolSettings(builder -> builder.maxSize(Integer.parseInt(maxConnections)));
+        }
+        return settingsBuilder;
     }
 
     /**
