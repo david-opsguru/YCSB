@@ -398,15 +398,15 @@ public class MongoDbClient extends DB {
         return outputMap;
     }
 
-  private void validateCredentials(AwsCredentialsProvider credentialsProvider) {
-    try {
-      credentialsProvider.resolveCredentials();
-      System.out.println("IAM Role credentials successfully resolved!");
-    } catch (Exception e) {
-      System.out.println("Failed to validate credentials: " + e.getMessage());
-      throw new RuntimeException("AWS credentials are invalid or unavailable.", e);
+    private void validateCredentials(AwsCredentialsProvider credentialsProvider) {
+        try {
+            credentialsProvider.resolveCredentials();
+            System.out.println("IAM Role credentials successfully resolved!");
+          } catch (Exception e) {
+            System.out.println("Failed to validate credentials: " + e.getMessage());
+            throw new RuntimeException("AWS credentials are invalid or unavailable.", e);
+        }
     }
-  }
 
     /**
      * Initialize any state for this DB.
@@ -425,12 +425,12 @@ public class MongoDbClient extends DB {
             String urls = props.getProperty("mongodb.url", "mongodb://localhost:27017");
 
             // AWS credentials setup from Service Account
-          DefaultCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
-          validateCredentials(credentialsProvider);
-          StsClient stsClient = StsClient.builder()
-                .credentialsProvider(credentialsProvider)
-                .region(Region.EU_WEST_1)
-                .build();
+            DefaultCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
+            validateCredentials(credentialsProvider);
+            StsClient stsClient = StsClient.builder()
+                  .credentialsProvider(credentialsProvider)
+                  .region(Region.EU_WEST_1)
+                  .build();
 
             GetCallerIdentityRequest request = GetCallerIdentityRequest.builder().build();
             GetCallerIdentityResponse response = stsClient.getCallerIdentity(request);
