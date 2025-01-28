@@ -525,7 +525,7 @@ public final class Client {
 
     private static Properties parseArguments(String[] args) {
         Properties props = new Properties();
-        System.err.print("Command line:");
+        log.info("Command line:");
         for (String arg : args) {
             System.err.print(" " + arg);
         }
