@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Turn seconds remaining into more useful units.
@@ -525,10 +526,7 @@ public final class Client {
 
     private static Properties parseArguments(String[] args) {
         Properties props = new Properties();
-        log.info("Command line:");
-        for (String arg : args) {
-            System.err.print(" " + arg);
-        }
+        log.info("Command line: {}", String.join(" ", args));
 
         Properties fileprops = new Properties();
         int argindex = 0;
