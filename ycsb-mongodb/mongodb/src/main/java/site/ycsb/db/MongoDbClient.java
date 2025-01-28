@@ -54,6 +54,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import java.util.Arrays;
@@ -536,6 +537,10 @@ public class MongoDbClient extends DB {
                     .writeConcern(writeConcern)
                     .readPreference(readPreference)
                     .applyToClusterSettings(builder -> builder.requiredClusterType(ClusterType.REPLICA_SET))
+                    .applyToConnectionPoolSettings(builder -> builder
+                    .maxSize(100)
+                    .minSize(10)
+                    .maxWaitTime(10, TimeUnit.SECONDS))
                     .build();
                 mongoClient = MongoClients.create(settings);
                 mongoClient.startSession();
