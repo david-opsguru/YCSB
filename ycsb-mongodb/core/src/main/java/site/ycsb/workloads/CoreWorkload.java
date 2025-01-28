@@ -850,7 +850,8 @@ public class CoreWorkload extends Workload {
     }
 
     static void addPortion(DiscreteGenerator operationChooser, String operation, double portion) {
-        log.info("[WORKLOAD], {}, {}%.", operation, portion);
+        Integer wrappedPortion = Double.valueOf(portion * 100).intValue();
+        log.info("[WORKLOAD], {}, {}%.", operation, wrappedPortion);
         operationChooser.addValue(portion, operation);
     }
 
