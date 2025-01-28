@@ -16,14 +16,13 @@
  */
 package site.ycsb.measurements.exporter;
 
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
  * Used to export the collected measurements into a useful format, for example
- * human readable text or machine readable JSON.
+ * human-readable text or machine-readable JSON.
  */
-public interface MeasurementsExporter extends Closeable {
+public interface MeasurementsExporter {
   /**
    * Write a measurement to the exported format.
    *

@@ -16,37 +16,28 @@
  */
 package site.ycsb.measurements.exporter;
 
-import java.io.BufferedWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 /**
- * Write human readable text. Tries to emulate the previous print report method.
+ * Write human-readable text. Tries to emulate the previous print report method.
  */
 public class TextMeasurementsExporter implements MeasurementsExporter {
-  private final BufferedWriter bw;
+    private static final Logger log = LoggerFactory.getLogger(TextMeasurementsExporter.class);
 
-  public TextMeasurementsExporter(OutputStream os) {
-    this.bw = new BufferedWriter(new OutputStreamWriter(os));
-  }
+  public TextMeasurementsExporter() { }
 
   public void write(String metric, String measurement, int i) throws IOException {
-    bw.write("[" + metric + "], " + measurement + ", " + i);
-    bw.newLine();
+    log.info("[" + metric + "], " + measurement + ", " + i);
   }
 
   public void write(String metric, String measurement, long i) throws IOException {
-    bw.write("[" + metric + "], " + measurement + ", " + i);
-    bw.newLine();
+    log.info("[" + metric + "], " + measurement + ", " + i);
   }
 
   public void write(String metric, String measurement, double d) throws IOException {
-    bw.write("[" + metric + "], " + measurement + ", " + d);
-    bw.newLine();
-  }
-
-  public void close() throws IOException {
-    this.bw.close();
+    log.info("[" + metric + "], " + measurement + ", " + d);
   }
 }

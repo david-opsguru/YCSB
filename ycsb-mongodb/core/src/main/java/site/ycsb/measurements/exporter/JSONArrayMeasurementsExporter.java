@@ -20,15 +20,13 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 /**
- * Export measurements into a machine readable JSON Array of measurement objects.
+ * Export measurements into a machine-readable JSON Array of measurement objects.
  */
-public class JSONArrayMeasurementsExporter implements MeasurementsExporter {
+@SuppressWarnings("deprecation")
+public class JSONArrayMeasurementsExporter implements MeasurementsExporter, Closeable {
   private final JsonFactory factory = new JsonFactory();
   private JsonGenerator g;
 
