@@ -529,7 +529,6 @@ public class MongoDbClient extends DB {
                     .readPreference(readPreference)
                     .applyToClusterSettings(builder -> builder
                         .requiredClusterType(ClusterType.REPLICA_SET)
-                        .serverSelectionTimeout(5000, java.util.concurrent.TimeUnit.MILLISECONDS)
                     )
                     .applyToConnectionPoolSettings(builder -> builder
                     .maxSize(10)
