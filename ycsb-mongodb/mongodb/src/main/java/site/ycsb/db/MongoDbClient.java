@@ -531,9 +531,7 @@ public class MongoDbClient extends DB {
                         .requiredClusterType(ClusterType.REPLICA_SET)
                     )
                     .applyToConnectionPoolSettings(builder -> builder
-                    .maxSize(10)
-                    .minSize(2)
-                    .maxWaitTime(10, TimeUnit.SECONDS))
+                        .maxWaitTime(10, TimeUnit.SECONDS))
                     .build();
                 mongoClient = MongoClients.create(settings);
                 mongoClient.startSession();
