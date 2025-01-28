@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Write human-readable text. Tries to emulate the previous print report method.
@@ -28,6 +29,7 @@ public class TextMeasurementsExporter implements MeasurementsExporter {
     private static final Logger log = LoggerFactory.getLogger(TextMeasurementsExporter.class);
 
   public TextMeasurementsExporter() { }
+  public TextMeasurementsExporter(OutputStream outputStream) { }
 
   public void write(String metric, String measurement, int i) throws IOException {
     log.info("[" + metric + "], " + measurement + ", " + i);
