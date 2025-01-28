@@ -527,7 +527,10 @@ public class MongoDbClient extends DB {
                     .serverApi(serverApi)
                     .writeConcern(writeConcern)
                     .readPreference(readPreference)
-                    .applyToClusterSettings(builder -> builder.requiredClusterType(ClusterType.REPLICA_SET))
+                    .applyToClusterSettings(builder -> builder
+                        .requiredClusterType(ClusterType.REPLICA_SET)
+                        .serverSelectionTimeout(5000, java.util.concurrent.TimeUnit.MILLISECONDS)
+                    )
                     .applyToConnectionPoolSettings(builder -> builder
                     .maxSize(10)
                     .minSize(2)
@@ -536,6 +539,7 @@ public class MongoDbClient extends DB {
                 mongoClient = MongoClients.create(settings);
                 mongoClient.startSession();
                 mongoDatabase = mongoClient.getDatabase(database);
+                mongoDatabase.runCommand(new org.bson.Document("profile", 2));
             } catch (Exception e1) {
                 log.error("Could not initialize MongoDB connection pool for Loader: {}", String.valueOf(e1));
                 System.exit(1);
