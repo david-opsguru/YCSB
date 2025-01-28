@@ -16,6 +16,9 @@
  */
 package site.ycsb.generator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -29,6 +32,8 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  */
 public class HotspotIntegerGenerator extends NumberGenerator {
+
+    private static final Logger log = LoggerFactory.getLogger(HotspotIntegerGenerator.class);
 
   private final long lowerBound;
   private final long upperBound;
@@ -48,15 +53,15 @@ public class HotspotIntegerGenerator extends NumberGenerator {
   public HotspotIntegerGenerator(long lowerBound, long upperBound,
                                  double hotsetFraction, double hotOpnFraction) {
     if (hotsetFraction < 0.0 || hotsetFraction > 1.0) {
-      System.err.println("Hotset fraction out of range. Setting to 0.0");
+      log.error("Hotset fraction out of range. Setting to 0.0");
       hotsetFraction = 0.0;
     }
     if (hotOpnFraction < 0.0 || hotOpnFraction > 1.0) {
-      System.err.println("Hot operation fraction out of range. Setting to 0.0");
+      log.error("Hot operation fraction out of range. Setting to 0.0");
       hotOpnFraction = 0.0;
     }
     if (lowerBound > upperBound) {
-      System.err.println("Upper bound of Hotspot generator smaller than the lower bound. " +
+      log.error("Upper bound of Hotspot generator smaller than the lower bound. " +
           "Swapping the values.");
       long temp = lowerBound;
       lowerBound = upperBound;

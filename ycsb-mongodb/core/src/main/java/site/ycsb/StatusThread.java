@@ -17,6 +17,8 @@
 
 package site.ycsb;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.measurements.Measurements;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -29,6 +31,8 @@ import java.util.concurrent.TimeUnit;
  * A thread to periodically show the status of the experiment to reassure you that progress is being made.
  */
 public class StatusThread extends Thread {
+
+    private static final Logger log = LoggerFactory.getLogger(StatusThread.class);
   // Counts down each of the clients completing
   private final CountDownLatch completeLatch;
 
@@ -176,10 +180,8 @@ public class StatusThread extends Thread {
 
     msg.append(Measurements.getMeasurements().getSummary());
 
-    System.err.println(msg);
-
     if (standardstatus) {
-      System.out.println(msg);
+      log.info(msg.toString());
     }
     return totalops;
   }

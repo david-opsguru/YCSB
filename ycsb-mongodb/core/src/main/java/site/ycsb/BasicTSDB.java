@@ -23,6 +23,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.workloads.TimeSeriesWorkload;
 
 /**
@@ -30,6 +32,7 @@ import site.ycsb.workloads.TimeSeriesWorkload;
  * of keys and fields.
  */
 public class BasicTSDB extends BasicDB {
+    private static final Logger log = LoggerFactory.getLogger(BasicTSDB.class);
 
   /** Time series workload specific counters. */
   protected static Map<Long, Integer> timestamps;
@@ -83,7 +86,6 @@ public class BasicTSDB extends BasicDB {
       }
 
       sb.append("]");
-      System.out.println(sb);
     }
 
     if (count) {
@@ -143,7 +145,6 @@ public class BasicTSDB extends BasicDB {
         }
       }
       sb.append("]");
-      System.out.println(sb);
     }
 
     if (count) {
@@ -196,7 +197,6 @@ public class BasicTSDB extends BasicDB {
         }
       }
       sb.append("]");
-      System.out.println(sb);
     }
 
     if (count) {
@@ -227,9 +227,9 @@ public class BasicTSDB extends BasicDB {
   public void cleanup() {
     super.cleanup();
     if (count && counter < 1) {
-      System.out.println("[TIMESTAMPS], Unique, " + timestamps.size());
-      System.out.println("[FLOATS], Unique series, " + floats.size());
-      System.out.println("[INTEGERS], Unique series, " + integers.size());
+        log.info("[TIMESTAMPS], Unique, {}", timestamps.size());
+        log.info("[FLOATS], Unique series, {}", floats.size());
+        log.info("[INTEGERS], Unique series, {}", integers.size());
       
       long minTs = Long.MAX_VALUE;
       long maxTs = Long.MIN_VALUE;
@@ -241,8 +241,8 @@ public class BasicTSDB extends BasicDB {
           minTs = ts;
         }
       }
-      System.out.println("[TIMESTAMPS], Min, " + minTs);
-      System.out.println("[TIMESTAMPS], Max, " + maxTs);
+        log.info("[TIMESTAMPS], Min, {}", minTs);
+        log.info("[TIMESTAMPS], Max, {}", maxTs);
     }
   }
   

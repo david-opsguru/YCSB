@@ -16,6 +16,9 @@
  */
 package site.ycsb;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 
 /**
@@ -26,6 +29,8 @@ import java.util.Collection;
  *
  */
 public class TerminatorThread extends Thread {
+
+    private static final Logger log = LoggerFactory.getLogger(TerminatorThread.class);
 
   private final Collection<? extends Thread> threads;
   private long maxExecutionTime;
@@ -38,25 +43,25 @@ public class TerminatorThread extends Thread {
     this.threads = threads;
     this.workload = workload;
     waitTimeOutInMS = 2000;
-    System.err.println("Maximum execution time specified as: " + maxExecutionTime + " secs");
+    log.error("Maximum execution time specified as: " + maxExecutionTime + " secs");
   }
 
   public void run() {
     try {
       Thread.sleep(maxExecutionTime * 1000);
     } catch (InterruptedException e) {
-      System.err.println("Could not wait until max specified time, TerminatorThread interrupted.");
+      log.error("Could not wait until max specified time, TerminatorThread interrupted.");
       return;
     }
-    System.err.println("Maximum time elapsed. Requesting stop for the workload.");
+    log.error("Maximum time elapsed. Requesting stop for the workload.");
     workload.requestStop();
-    System.err.println("Stop requested for workload. Now Joining!");
+    log.error("Stop requested for workload. Now Joining!");
     for (Thread t : threads) {
       while (t.isAlive()) {
         try {
           t.join(waitTimeOutInMS);
           if (t.isAlive()) {
-            System.out.println("Still waiting for thread " + t.getName() + " to complete. " +
+            log.info("Still waiting for thread " + t.getName() + " to complete. " +
                 "Workload status: " + workload.isStopRequested());
           }
         } catch (InterruptedException e) {

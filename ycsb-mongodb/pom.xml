@@ -22,31 +22,22 @@
   </licenses>
 
   <dependencies>
-    <!--
-    Nail down slf4j version to 1.6 so that it defaults to no-op logger.
-    http://www.slf4j.org/codes.html#StaticLoggerBinder
-    -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.6.4</version>
-    </dependency>
-    <!-- Uncomment this to get lots of driver logging
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>1.6.4</version>
-    </dependency>-->
+
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongodb-crypt</artifactId>
       <version>1.5.2</version>
     </dependency>
-    <!-- mongodb-crypt is pulling in a SNAPSHOT release of bson, so to work around that pin the bson library explicitly -->
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>bson</artifactId>
       <version>${mongodb.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.0.16</version>
     </dependency>
   </dependencies>
 

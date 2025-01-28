@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.ByteIterator;
 import site.ycsb.Client;
 import site.ycsb.DB;
@@ -46,6 +48,8 @@ import site.ycsb.measurements.Measurements;
 import org.testng.annotations.Test;
 
 public class TestTimeSeriesWorkload {
+
+    private static final Logger log = LoggerFactory.getLogger(TestTimeSeriesWorkload.class);
   
   @Test
   public void twoThreads() throws Exception {
@@ -570,7 +574,7 @@ public class TestTimeSeriesWorkload {
             System.out.print(new String(entry.getValue().toArray()) + "}");
           }
         }
-        System.out.println("}");
+        log.info("}");
       }
     }
   }

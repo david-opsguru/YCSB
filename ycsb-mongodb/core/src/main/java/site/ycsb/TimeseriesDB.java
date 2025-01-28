@@ -16,6 +16,8 @@
  */
 package site.ycsb;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.generator.Generator;
 import site.ycsb.generator.IncrementingPrintableStringGenerator;
 import site.ycsb.workloads.TimeSeriesWorkload;
@@ -37,6 +39,8 @@ import java.util.concurrent.TimeUnit;
  * to correctly initialize the workload-parsing.
  */
 public abstract class TimeseriesDB extends DB {
+
+    private static final Logger log = LoggerFactory.getLogger(TimeseriesDB.class);
 
   // defaults for downsampling. Basically we ignore it
   private static final String DOWNSAMPLING_FUNCTION_PROPERTY_DEFAULT = "NONE";
@@ -183,7 +187,7 @@ public abstract class TimeseriesDB extends DB {
         String[] queryParts = field.split(tagPairDelimiter);
         if (queryParts.length == 1) {
           // we should probably warn about this being ignored...
-          System.err.println("Grouping by arbitrary series is currently not supported");
+          log.error("Grouping by arbitrary series is currently not supported");
           groupByFields.add(field);
         } else {
           tagQueries.computeIfAbsent(queryParts[0], k -> new ArrayList<>()).add(queryParts[1]);

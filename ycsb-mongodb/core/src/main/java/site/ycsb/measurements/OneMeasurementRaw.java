@@ -17,6 +17,8 @@
 
 package site.ycsb.measurements;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.measurements.exporter.MeasurementsExporter;
 
 import java.io.FileNotFoundException;
@@ -34,6 +36,8 @@ import java.util.Properties;
  *
  */
 public class OneMeasurementRaw extends OneMeasurement {
+
+    private static final Logger log = LoggerFactory.getLogger(OneMeasurementRaw.class);
   /**
    * One raw data point, two fields: timestamp (ms) when the datapoint is
    * inserted, and the value.
@@ -106,7 +110,7 @@ public class OneMeasurementRaw extends OneMeasurement {
 
     String outputFilePath = props.getProperty(OUTPUT_FILE_PATH, OUTPUT_FILE_PATH_DEFAULT);
     if (!outputFilePath.isEmpty()) {
-      System.out.println("Raw data measurement: will output to result file: " +
+      log.info("Raw data measurement: will output to result file: " +
           outputFilePath);
 
       try {
@@ -118,7 +122,7 @@ public class OneMeasurementRaw extends OneMeasurement {
       }
 
     } else {
-      System.out.println("Raw data measurement: will output to stdout.");
+      log.info("Raw data measurement: will output to stdout.");
       outputStream = System.out;
 
     }

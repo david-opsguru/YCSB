@@ -17,6 +17,9 @@
 
 package site.ycsb.generator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -29,6 +32,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * Alternatively, 1/gamma is the average length of an interval.
  */
 public class ExponentialGenerator extends NumberGenerator {
+
+    private static final Logger log = LoggerFactory.getLogger(ExponentialGenerator.class);
   // What percentage of the readings should be within the most recent exponential.frac portion of the dataset?
   public static final String EXPONENTIAL_PERCENTILE_PROPERTY = "exponential.percentile";
   public static final String EXPONENTIAL_PERCENTILE_DEFAULT = "95";
@@ -82,6 +87,6 @@ public class ExponentialGenerator extends NumberGenerator {
         j++;
       }
     }
-    System.out.println("Got " + j + " hits.  Expect 900");
+    log.info("Got " + j + " hits.  Expect 900");
   }
 }

@@ -28,6 +28,8 @@ import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.ByteIterator;
 import site.ycsb.Client;
 import site.ycsb.DB;
@@ -281,7 +283,9 @@ import site.ycsb.measurements.Measurements;
  * It's more of a bulk-loading operation now.</li>
  * </ul>
  */
-public class TimeSeriesWorkload extends Workload {  
+public class TimeSeriesWorkload extends Workload {
+
+    private static final Logger log = LoggerFactory.getLogger(TimeSeriesWorkload.class);
   
   /**
    * The types of values written to the timeseries store.
@@ -635,7 +639,7 @@ public class TimeSeriesWorkload extends Workload {
         p.getProperty(CoreWorkload.DATA_INTEGRITY_PROPERTY, 
             CoreWorkload.DATA_INTEGRITY_PROPERTY_DEFAULT));
     if (dataintegrity) {
-      System.out.println("Data integrity is enabled.");
+      log.info("Data integrity is enabled.");
     }
     
     queryTimeSpan = Integer.parseInt(p.getProperty(QUERY_TIMESPAN_PROPERTY, 

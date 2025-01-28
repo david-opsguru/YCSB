@@ -16,6 +16,8 @@
  */
 package site.ycsb.workloads;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.Client;
 import site.ycsb.WorkloadException;
 import site.ycsb.generator.NumberGenerator;
@@ -43,6 +45,8 @@ import java.util.Properties;
  * </p>
  */
 public class ConstantOccupancyWorkload extends CoreWorkload {
+
+    private static final Logger log = LoggerFactory.getLogger(ConstantOccupancyWorkload.class);
   private long disksize;
   private long storageages;
   private double occupancy;
@@ -67,7 +71,7 @@ public class ConstantOccupancyWorkload extends CoreWorkload {
     if (p.getProperty(Client.RECORD_COUNT_PROPERTY) != null ||
         p.getProperty(Client.INSERT_COUNT_PROPERTY) != null ||
         p.getProperty(Client.OPERATION_COUNT_PROPERTY) != null) {
-      System.err.println("Warning: record, insert or operation count was set prior to initting " +
+      log.error("Warning: record, insert or operation count was set prior to initting " +
           "ConstantOccupancyWorkload.  Overriding old values.");
     }
     NumberGenerator g = CoreWorkload.getFieldLengthGenerator(p);

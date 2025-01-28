@@ -17,6 +17,9 @@
 
 package site.ycsb;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.Map;
@@ -28,6 +31,8 @@ import java.util.concurrent.locks.LockSupport;
  * Basic DB that just prints out the requested operations, instead of doing them against a database.
  */
 public class BasicDB extends DB {
+
+    private static final Logger log = LoggerFactory.getLogger(BasicDB.class);
   public static final String COUNT = "basicdb.count";
   public static final String COUNT_DEFAULT = "false";
   
@@ -87,15 +92,15 @@ public class BasicDB extends DB {
     count = Boolean.parseBoolean(getProperties().getProperty(COUNT, COUNT_DEFAULT));
     if (verbose) {
       synchronized (System.out) {
-        System.out.println("***************** properties *****************");
+        log.info("***************** properties *****************");
         Properties p = getProperties();
         if (p != null) {
           for (Enumeration e = p.propertyNames(); e.hasMoreElements();) {
             String k = (String) e.nextElement();
-            System.out.println("\"" + k + "\"=\"" + p.getProperty(k) + "\"");
+            log.info("\"" + k + "\"=\"" + p.getProperty(k) + "\"");
           }
         }
-        System.out.println("**********************************************");
+        log.info("**********************************************");
       }
     }
     
@@ -148,7 +153,6 @@ public class BasicDB extends DB {
       }
 
       sb.append("]");
-      System.out.println(sb);
     }
 
     if (count) {
@@ -185,7 +189,6 @@ public class BasicDB extends DB {
       }
 
       sb.append("]");
-      System.out.println(sb);
     }
     
     if (count) {
@@ -216,7 +219,6 @@ public class BasicDB extends DB {
         }
       }
       sb.append("]");
-      System.out.println(sb);
     }
 
     if (count) {
@@ -248,7 +250,6 @@ public class BasicDB extends DB {
       }
 
       sb.append("]");
-      System.out.println(sb);
     }
 
     if (count) {
@@ -272,7 +273,6 @@ public class BasicDB extends DB {
     if (verbose) {
       StringBuilder sb = getStringBuilder();
       sb.append("DELETE ").append(table).append(" ").append(key);
-      System.out.println(sb);
     }
 
     if (count) {
@@ -289,11 +289,11 @@ public class BasicDB extends DB {
       if (count && countDown < 1) {
         // TODO - would be nice to call something like: 
         // Measurements.getMeasurements().oneOffMeasurement("READS", "Uniques", reads.size());
-        System.out.println("[READS], Uniques, " + reads.size());
-        System.out.println("[SCANS], Uniques, " + scans.size());
-        System.out.println("[UPDATES], Uniques, " + updates.size());
-        System.out.println("[INSERTS], Uniques, " + inserts.size());
-        System.out.println("[DELETES], Uniques, " + deletes.size());
+          log.info("[READS], Uniques, {}", reads.size());
+          log.info("[SCANS], Uniques, {}", scans.size());
+          log.info("[UPDATES], Uniques, {}", updates.size());
+          log.info("[INSERTS], Uniques, {}", inserts.size());
+          log.info("[DELETES], Uniques, {}", deletes.size());
       }
     }
   }

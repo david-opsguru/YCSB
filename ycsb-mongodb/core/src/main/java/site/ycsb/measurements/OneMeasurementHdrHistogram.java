@@ -17,6 +17,8 @@
 
 package site.ycsb.measurements;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.measurements.exporter.MeasurementsExporter;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.HistogramIterationValue;
@@ -38,6 +40,7 @@ import java.util.Properties;
  */
 public class OneMeasurementHdrHistogram extends OneMeasurement {
 
+    private static final Logger logger = LoggerFactory.getLogger(OneMeasurementHdrHistogram.class);
   // we need one log per measurement histogram
   private final PrintStream log;
   private final HistogramLogWriter histogramLogWriter;
@@ -191,8 +194,7 @@ public class OneMeasurementHdrHistogram extends OneMeasurement {
     } catch (Exception e) {
       // If the given hdrhistogram.percentiles value is unreadable for whatever reason,
       // then calculate and return the default set.
-      System.err.println("[WARN] Couldn't read " + PERCENTILES_PROPERTY + " value: '" + percentileString +
-          "', the default of '" + PERCENTILES_PROPERTY_DEFAULT + "' will be used.");
+        logger.error("[WARN] Couldn't read " + PERCENTILES_PROPERTY + " value: '{}', the default of '" + PERCENTILES_PROPERTY_DEFAULT + "' will be used.", percentileString);
       e.printStackTrace();
       return getPercentileValues(PERCENTILES_PROPERTY_DEFAULT);
     }

@@ -19,6 +19,8 @@ package site.ycsb;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.measurements.Measurements;
 import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
@@ -31,6 +33,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Also reports latency separately between OK and failed operations.
  */
 public class DBWrapper extends DB {
+
+    private static final Logger log = LoggerFactory.getLogger(DBWrapper.class);
   private final DB db;
   private final Measurements measurements;
   private final Tracer tracer;
@@ -103,7 +107,7 @@ public class DBWrapper extends DB {
       }
 
       if (LOG_REPORT_CONFIG.compareAndSet(false, true)) {
-        System.err.println("DBWrapper: report latency for each error is " +
+        log.error("DBWrapper: report latency for each error is " +
             this.reportLatencyForEachError + " and specific error codes to track" +
             " for latency are: " + this.latencyTrackedErrors.toString());
       }

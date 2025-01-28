@@ -17,6 +17,9 @@
 
 package site.ycsb;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -34,6 +37,8 @@ import static java.util.concurrent.TimeUnit.MICROSECONDS;
  * Basic DB that just prints out the requested operations, instead of doing them against a database.
  */
 public class GoodBadUglyDB extends DB {
+
+    private static final Logger log = LoggerFactory.getLogger(GoodBadUglyDB.class);
   public static final String SIMULATE_DELAY = "gbudb.delays";
   public static final String SIMULATE_DELAY_DEFAULT = "200,1000,10000,50000,100000";
   private static final ReadWriteLock DB_ACCESS = new ReentrantReadWriteLock();
@@ -59,7 +64,7 @@ public class GoodBadUglyDB extends DB {
     // this will make mod 3 pauses global
     Lock lock = mod == 3 ? DB_ACCESS.writeLock() : DB_ACCESS.readLock();
     if (mod == 3) {
-      System.out.println("OUCH");
+      log.info("OUCH");
     }
     lock.lock();
     try {

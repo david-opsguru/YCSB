@@ -17,6 +17,9 @@
 
 package site.ycsb.generator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -40,6 +43,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * The algorithm used here is from "Quickly Generating Billion-Record Synthetic Databases", Jim Gray et al, SIGMOD 1994.
  */
 public class ZipfianGenerator extends NumberGenerator {
+
+    private static final Logger log = LoggerFactory.getLogger(ZipfianGenerator.class);
   public static final double ZIPFIAN_CONSTANT = 0.99;
 
   /**
@@ -202,7 +207,7 @@ public class ZipfianGenerator extends NumberGenerator {
       sum += 1 / (Math.pow(i + 1, theta));
     }
 
-    //System.out.println("countforzeta="+countforzeta);
+    //log.info("countforzeta="+countforzeta);
 
     return sum;
   }
@@ -224,7 +229,7 @@ public class ZipfianGenerator extends NumberGenerator {
       //have to recompute zetan and eta, since they depend on itemcount
       synchronized (this) {
         if (itemcount > countforzeta) {
-          //System.err.println("WARNING: Incrementally recomputing Zipfian distribtion. (itemcount="+itemcount+"
+          //log.error("WARNING: Incrementally recomputing Zipfian distribtion. (itemcount="+itemcount+"
           // countforzeta="+countforzeta+")");
 
           //we have added more items. can compute zetan incrementally, which is cheaper
@@ -238,7 +243,7 @@ public class ZipfianGenerator extends NumberGenerator {
           // then just subtract the zeta sequence terms for the items that went away. This would be faster than
           // recomputing from scratch when the number of items decreases
 
-          System.err.println("WARNING: Recomputing Zipfian distribtion. This is slow and should be avoided. " +
+          log.error("WARNING: Recomputing Zipfian distribtion. This is slow and should be avoided. " +
               "(itemcount=" + itemcount + " countforzeta=" + countforzeta + ")");
 
           zetan = zeta(itemcount, theta);

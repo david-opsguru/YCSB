@@ -17,6 +17,8 @@
 
 package site.ycsb.measurements;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import site.ycsb.Status;
 import site.ycsb.measurements.exporter.MeasurementsExporter;
 
@@ -28,6 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Collects latency measurements, and reports them when requested.
  */
 public class Measurements {
+
+    private static final Logger log = LoggerFactory.getLogger(Measurements.class);
   /**
    * All supported measurement types are defined in this enum.
    */
@@ -189,7 +193,7 @@ public class Measurements {
       m.measure(latency);
     } catch (java.lang.ArrayIndexOutOfBoundsException e) {
       // This seems like a terribly hacky way to cover up for a bug in the measurement code
-      System.out.println("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
+      log.info("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
       e.printStackTrace();
       e.printStackTrace(System.out);
     }
@@ -208,7 +212,7 @@ public class Measurements {
       m.measure(latency);
     } catch (java.lang.ArrayIndexOutOfBoundsException e) {
       // This seems like a terribly hacky way to cover up for a bug in the measurement code
-      System.out.println("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
+      log.info("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
       e.printStackTrace();
       e.printStackTrace(System.out);
     }
