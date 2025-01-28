@@ -513,7 +513,6 @@ public class MongoDbClient extends DB {
                 mongoClient.startSession();
                 Thread.sleep(Duration.ofSeconds(10L));
                 mongoDatabase = mongoClient.getDatabase(database);
-                mongoDatabase.runCommand(new org.bson.Document("profile", 2));
             } catch (Exception e1) {
                 log.error("Could not initialize MongoDB connection pool for Loader: {}", String.valueOf(e1));
                 System.exit(1);
