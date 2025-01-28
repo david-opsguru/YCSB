@@ -607,7 +607,6 @@ public class MongoDbClient extends DB {
                 collection.insertOne(r);
                 return Status.OK;
             } catch (Exception e) {
-                log.error("Couldn't insert key {}", key);
                 return Status.ERROR;
             }
         }

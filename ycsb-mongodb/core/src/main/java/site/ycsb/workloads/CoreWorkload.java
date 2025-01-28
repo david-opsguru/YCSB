@@ -640,9 +640,7 @@ public class CoreWorkload extends Workload {
                 }
 
             } else {
-                log.error("Error inserting, not retrying any more. number of attempts: {} Insertion Retry Limit: {}", numOfRetries, insertionRetryLimit);
                 break;
-
             }
         } while (true);
 
