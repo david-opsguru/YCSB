@@ -535,7 +535,7 @@ public class MongoDbClient extends DB {
                     .serverApi(serverApi)
                     .writeConcern(writeConcern)
                     .readPreference(readPreference)
-                    .applyToClusterSettings(builder -> builder.requiredClusterType(ClusterType.REPLICA_SET))
+                    .applyToClusterSettings(builder -> builder.requiredClusterType(ClusterType.SHARDED))
                     .build();
                 mongoClient = MongoClients.create(settings);
                 mongoDatabase = mongoClient.getDatabase(database);
