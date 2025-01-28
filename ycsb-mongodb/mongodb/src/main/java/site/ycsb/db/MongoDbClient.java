@@ -42,6 +42,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sts.StsClient;
 
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -414,32 +415,10 @@ public class MongoDbClient extends DB {
             // AWS credentials setup from Service Account
             DefaultCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
             credentialsProvider.resolveCredentials();
-            StsClient stsClient = StsClient.builder()
+            StsClient.builder()
                 .credentialsProvider(credentialsProvider)
                 .region(Region.EU_WEST_1)
                 .build();
-
-            // Retrieve username and password from properties, set to empty string if they are undefined
-            String username = props.getProperty("mongodb.username", "");
-            String password = props.getProperty("mongodb.password", "");
-
-            // If the URI contains an @, that means a username and password are specified here as well, so this will parse them out
-            if (urls.contains("@")) {
-                String uriCredentials = urls.substring(urls.indexOf("//") + 2, urls.indexOf("@"));
-                String[] uriCredentialsList = uriCredentials.split(":");
-                String uriUsername = uriCredentialsList[0];
-                String uriPassword = uriCredentialsList[1];
-
-                // If both the URI and properties have credentials defined, check that they are equivalent
-                // If they are not, update credentials to those in the URI and log a warning
-                if (props.keySet().contains("mongodb.username") && props.keySet().contains("mongodb.password")) {
-                    if (!uriUsername.equals(username) || !uriPassword.equals(password)) {
-                        log.warn("Username/Password provided in the properties does not match what is present in the URI, defaulting to the URI");
-                    }
-                }
-                username = uriUsername;
-                password = uriPassword;
-            }
 
             // Set insert batchsize, default 1 - to be YCSB-original equivalent
             final String batchSizeString = props.getProperty("batchsize", "1");
@@ -450,9 +429,6 @@ public class MongoDbClient extends DB {
 
             final String compressibilityString = props.getProperty("compressibility", "1");
             compressibility = Float.parseFloat(compressibilityString);
-
-            // Set connectionpool to size of ycsb thread pool
-            final String maxConnections = props.getProperty("threadcount", "100");
 
             String writeConcernType = props.getProperty("mongodb.writeConcern",
                 "acknowledged").toLowerCase();
@@ -535,6 +511,7 @@ public class MongoDbClient extends DB {
                     .build();
                 mongoClient = MongoClients.create(settings);
                 mongoClient.startSession();
+                Thread.sleep(Duration.ofSeconds(10L));
                 mongoDatabase = mongoClient.getDatabase(database);
                 mongoDatabase.runCommand(new org.bson.Document("profile", 2));
             } catch (Exception e1) {
