@@ -413,16 +413,6 @@ public class MongoDbClient extends DB {
         return outputMap;
     }
 
-    private void validateCredentials(AwsCredentialsProvider credentialsProvider) {
-        try {
-            credentialsProvider.resolveCredentials();
-            log.info("IAM Role credentials successfully resolved!");
-        } catch (Exception e) {
-            log.info("Failed to validate credentials: {}", e.getMessage());
-            throw new RuntimeException("AWS credentials are invalid or unavailable.", e);
-        }
-    }
-
     /**
      * Initialize any state for this DB.
      * Called once per DB instance; there is one DB instance per client thread.
@@ -441,7 +431,7 @@ public class MongoDbClient extends DB {
 
             // AWS credentials setup from Service Account
             DefaultCredentialsProvider credentialsProvider = DefaultCredentialsProvider.create();
-            validateCredentials(credentialsProvider);
+            credentialsProvider.resolveCredentials();
             StsClient stsClient = StsClient.builder()
                 .credentialsProvider(credentialsProvider)
                 .region(Region.EU_WEST_1)
