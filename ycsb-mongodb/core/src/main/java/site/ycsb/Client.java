@@ -236,9 +236,7 @@ public final class Client {
         exporter = (MeasurementsExporter) Class.forName(exporterStr).getConstructor(OutputStream.class)
             .newInstance(out);
       } catch (Exception e) {
-        log.error("Could not find exporter " + exporterStr
-            + ", will use default text reporter.");
-        e.printStackTrace();
+          log.error("Could not find exporter {}, will use default text reporter.", exporterStr);
         exporter = new TextMeasurementsExporter(out);
       }
 
@@ -310,7 +308,7 @@ public final class Client {
 
     initWorkload(props, warningthread, workload, tracer);
 
-    log.error("Starting test.");
+    log.info("Starting test.");
     final CountDownLatch completeLatch = new CountDownLatch(threadcount);
 
     final List<ClientThread> clients = initDb(dbname, props, threadcount, targetperthreadperms,
@@ -387,7 +385,6 @@ public final class Client {
         workload.cleanup();
       }
     } catch (WorkloadException e) {
-      e.printStackTrace();
       e.printStackTrace(System.out);
       System.exit(0);
     }
@@ -397,8 +394,7 @@ public final class Client {
         exportMeasurements(props, opsDone, en - st);
       }
     } catch (IOException e) {
-      log.error("Could not export measurements, error: " + e.getMessage());
-      e.printStackTrace();
+        log.error("Could not export measurements, error: {}", e.getMessage());
       System.exit(-1);
     }
 
@@ -425,14 +421,14 @@ public final class Client {
       }
       if (threadcount > opcount && opcount > 0){
         threadcount = opcount;
-        log.info("Warning: the threadcount is bigger than recordcount, the threadcount will be recordcount!");
+        log.warn("The threadcount is bigger than recordcount, the threadcount will be recordcount!");
       }
       for (int threadid = 0; threadid < threadcount; threadid++) {
         DB db;
         try {
           db = DBFactory.newDB(dbname, props, tracer);
         } catch (UnknownDBException e) {
-          log.info("Unknown DB " + dbname);
+            log.info("Unknown DB {}", dbname);
           initFailed = true;
           break;
         }
@@ -452,7 +448,7 @@ public final class Client {
       }
 
       if (initFailed) {
-        log.error("Error initializing datastore bindings.");
+        log.info("Error initializing datastore bindings.");
         System.exit(0);
       }
     }
@@ -500,7 +496,7 @@ public final class Client {
         } catch (InterruptedException e) {
           return;
         }
-        log.error(" (might take a few minutes for large data sets)");
+        log.info(" (might take a few minutes for large data sets)");
       }
     };
   }
@@ -511,18 +507,17 @@ public final class Client {
     try {
       Properties projectProp = new Properties();
       projectProp.load(classLoader.getResourceAsStream("project.properties"));
-      log.error("YCSB Client " + projectProp.getProperty("version"));
+        log.info("YCSB Client {}", projectProp.getProperty("version"));
     } catch (IOException e) {
       log.error("Unable to retrieve client version.");
     }
 
-    log.error("Loading workload...");
+    log.info("Loading workload...");
     try {
-      Class workloadclass = classLoader.loadClass(props.getProperty(WORKLOAD_PROPERTY));
+      Class<?> workloadclass = classLoader.loadClass(props.getProperty(WORKLOAD_PROPERTY));
 
       return (Workload) workloadclass.newInstance();
     } catch (Exception e) {
-      e.printStackTrace();
       e.printStackTrace(System.out);
       System.exit(0);
     }
@@ -551,7 +546,7 @@ public final class Client {
         argindex++;
         if (argindex >= args.length) {
           usageMessage();
-          log.info("Missing argument value for -threads.");
+          log.warn("Missing argument value for -threads.");
           System.exit(0);
         }
         int tcount = Integer.parseInt(args[argindex]);
@@ -561,7 +556,7 @@ public final class Client {
         argindex++;
         if (argindex >= args.length) {
           usageMessage();
-          log.info("Missing argument value for -target.");
+          log.warn("Missing argument value for -target.");
           System.exit(0);
         }
         int ttarget = Integer.parseInt(args[argindex]);
@@ -580,7 +575,7 @@ public final class Client {
         argindex++;
         if (argindex >= args.length) {
           usageMessage();
-          log.info("Missing argument value for -db.");
+          log.warn("Missing argument value for -db.");
           System.exit(0);
         }
         props.setProperty(DB_PROPERTY, args[argindex]);
@@ -589,7 +584,7 @@ public final class Client {
         argindex++;
         if (argindex >= args.length) {
           usageMessage();
-          log.info("Missing argument value for -l.");
+          log.warn("Missing argument value for -l.");
           System.exit(0);
         }
         props.setProperty(LABEL_PROPERTY, args[argindex]);
@@ -598,7 +593,7 @@ public final class Client {
         argindex++;
         if (argindex >= args.length) {
           usageMessage();
-          log.info("Missing argument value for -P.");
+          log.warn("Missing argument value for -P.");
           System.exit(0);
         }
         String propfile = args[argindex];
@@ -608,13 +603,13 @@ public final class Client {
         try {
           myfileprops.load(new FileInputStream(propfile));
         } catch (IOException e) {
-          log.info("Unable to open the properties file " + propfile);
-          log.info(e.getMessage());
+            log.error("Unable to open the properties file {}", propfile);
+          log.error(e.getMessage());
           System.exit(0);
         }
 
         //Issue #5 - remove call to stringPropertyNames to make compilable under Java 1.5
-        for (Enumeration e = myfileprops.propertyNames(); e.hasMoreElements();) {
+        for (Enumeration<?> e = myfileprops.propertyNames(); e.hasMoreElements();) {
           String prop = (String) e.nextElement();
 
           fileprops.setProperty(prop, myfileprops.getProperty(prop));
@@ -630,7 +625,7 @@ public final class Client {
         int eq = args[argindex].indexOf('=');
         if (eq < 0) {
           usageMessage();
-          log.info("Argument '-p' expected to be in key=value format (e.g., -p operationcount=99999)");
+          log.warn("Argument '-p' expected to be in key=value format (e.g., -p operationcount=99999)");
           System.exit(0);
         }
 
@@ -640,7 +635,7 @@ public final class Client {
         argindex++;
       } else {
         usageMessage();
-        log.info("Unknown option " + args[argindex]);
+          log.warn("Unknown option {}", args[argindex]);
         System.exit(0);
       }
 
@@ -652,10 +647,9 @@ public final class Client {
     if (argindex != args.length) {
       usageMessage();
       if (argindex < args.length) {
-        log.info("An argument value without corresponding argument specifier (e.g., -p, -s) was found. "
-            + "We expected an argument specifier and instead found " + args[argindex]);
+          log.warn("An argument value without corresponding argument specifier (e.g., -p, -s) was found. We expected an argument specifier and instead found {}", args[argindex]);
       } else {
-        log.info("An argument specifier without corresponding value was found at the end of the supplied " +
+        log.warn("An argument specifier without corresponding value was found at the end of the supplied " +
             "command line arguments.");
       }
       System.exit(0);
@@ -673,7 +667,7 @@ public final class Client {
     props = fileprops;
 
     if (!checkRequiredProperties(props)) {
-      log.info("Failed check required properties.");
+      log.error("Failed check required properties.");
       System.exit(0);
     }
 
