@@ -17,8 +17,10 @@
 
 package site.ycsb;
 
+import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import site.ycsb.measurements.Measurements;
 import site.ycsb.measurements.exporter.MeasurementsExporter;
 import site.ycsb.measurements.exporter.TextMeasurementsExporter;
@@ -80,7 +82,9 @@ public final class Client {
 
     private static final Logger log = LoggerFactory.getLogger(Client.class);
   private Client() {
-    //not used
+      ILoggerFactory loggerContext = LoggerFactory.getILoggerFactory();
+      Logger rootLogger = loggerContext.getLogger("org.mongodb.driver");
+      rootLogger.makeLoggingEventBuilder(Level.ERROR);
   }
 
   public static final String DEFAULT_RECORD_COUNT = "0";
